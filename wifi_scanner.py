@@ -231,13 +231,13 @@ def main():
                 print(f"  Channel: {network.get('Channel', 'N/A')}")
                 print(f"  Band: {network.get('Band', 'N/A')}")
                 print(f"  MAC: {network.get('BSSID', 'N/A')}")
+                #print("\n")
                 sc.find_pin(network.get('BSSID', 'N/A'), pin_db)
         else:
             print("No networks found.")
         time.sleep(args.timeout)
 
     print("Scanning completed!")
-
 
 if __name__ == "__main__":
     main()

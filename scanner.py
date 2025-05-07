@@ -9,7 +9,7 @@ def load_pin_database(csv_file='pins.csv'):
     try:
         df = pd.read_csv(csv_file, encoding='utf-8')
         print(f"Loaded {len(df)} records from CSV")
-        print(f"{df}")
+        #print(f"{df}")
 
     except Exception as e:
         print(f"Error loading CSV: {e}")
@@ -24,9 +24,17 @@ test_bssids = [
     ]
 
 def find_pin(bssid, pin_db):
+    df = pin_db
     oui = normalize_bssid(bssid)
-    pin = pin_db.get(oui, "Not found")
-    print(f"可能的PIN: {pin}") 
+    #print(f"\nTesting BSSID: {bssid} → OUI: {oui}")
+
+    matches = df[df['OUI'] == oui]
+    if not matches.empty:
+        for index, match in matches.iterrows():
+            print(f"→ PIN: {match['PIN']}")
+    else:
+        print("No matching PIN found.")
+    #print(f"可能的PIN: {pin}") 
 
 if __name__ == "__main__":
     df = load_pin_database()
@@ -40,6 +48,7 @@ if __name__ == "__main__":
     matches = df[df['OUI'] == test_oui]
     if not matches.empty:
         for index, match in matches.iterrows():
+            print("\n")
             print(f"Matched OUI: {match['OUI']} → PIN: {match['PIN']}")
     else:
         print("No matching PIN found.")
