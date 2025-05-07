@@ -210,6 +210,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Wi-Fi Network Scanner Tool")
     parser.add_argument('-t', '--timeout', type=int, default=10, help='Timeout duration between scans in seconds')
     parser.add_argument('-r', '--retries', type=int, default=1, help='Number of retries for scanning')
+    parser.add_argument('-i', '--interface', type=str, default='wlan0', help='Network interface name')
     return parser.parse_args()
 
 def main():
@@ -225,14 +226,17 @@ def main():
             for network in networks:
                 #print("\nRaw Network Data:", network) 
                 print(f"\nSSID: {network.get('SSID', 'N/A')}")
-                print(f"  Signal Strength: {network.get('Signal', 'N/A')}%")
-                print(f"  Authentication: {network.get('Authentication', 'N/A')}")
+                #print(f"  Signal Strength: {network.get('Signal', 'N/A')}%")
+                #print(f"  Authentication: {network.get('Authentication', 'N/A')}")
                 #print(f"  Encryption: {network.get('Encryption', 'N/A')}")
-                print(f"  Channel: {network.get('Channel', 'N/A')}")
-                print(f"  Band: {network.get('Band', 'N/A')}")
+                #print(f"  Channel: {network.get('Channel', 'N/A')}")
+                #print(f"  Band: {network.get('Band', 'N/A')}")
                 print(f"  MAC: {network.get('BSSID', 'N/A')}")
                 #print("\n")
-                sc.find_pin(network.get('BSSID', 'N/A'), pin_db)
+                pins = sc.find_pin(network.get('BSSID', 'N/A'), pin_db)
+                #if platform.system().lower() == "linux":
+                #    sc.cf_pins(pins, args.interface)
+                
         else:
             print("No networks found.")
         time.sleep(args.timeout)
