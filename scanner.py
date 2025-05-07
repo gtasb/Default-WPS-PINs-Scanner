@@ -10,9 +10,11 @@ def load_pin_database(csv_file='pins.csv'):
         df = pd.read_csv(csv_file, encoding='utf-8')
         print(f"Loaded {len(df)} records from CSV")
         print(f"{df}")
+
     except Exception as e:
         print(f"Error loading CSV: {e}")
-    return pin_db
+    #return pin_db
+    return df
 
 # 假设你从扫描中得到了这个 MAC 地址
 test_bssids = [
@@ -27,5 +29,17 @@ def find_pin(bssid, pin_db):
     print(f"可能的PIN: {pin}") 
 
 if __name__ == "__main__":
-    pin_db = load_pin_database()
-    print(pin_db)
+    df = load_pin_database()
+    # print("All entries:")
+    # print(df[['OUI', 'PIN']])  
+
+    test_bssid = "5C:35:3B:00:00:00"
+    test_oui = normalize_bssid(test_bssid)
+    print(f"\nTesting BSSID: {test_bssid} → OUI: {test_oui}")
+
+    matches = df[df['OUI'] == test_oui]
+    if not matches.empty:
+        for index, match in matches.iterrows():
+            print(f"Matched OUI: {match['OUI']} → PIN: {match['PIN']}")
+    else:
+        print("No matching PIN found.")
