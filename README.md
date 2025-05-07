@@ -1,2 +1,2 @@
-# Default-WPS-PINs
-This is the WPS default PINs collection collected from various sources online
+# Default-WPS-PINs-Scanner
+路由器默认wps pin码扫描器
