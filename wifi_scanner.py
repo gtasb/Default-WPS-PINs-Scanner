@@ -4,6 +4,7 @@ import platform
 import argparse
 import subprocess
 import scanner as sc
+import os
 
 def scan_wifi():
     system_platform = platform.system().lower()
@@ -216,7 +217,7 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    pin_db = sc.load_pin_database(csv_file='pins.csv')
+    pin_db = sc.load_pin_database(csv_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pins.csv'))
 
     for retry in range(args.retries):
         print(f"Scan attempt {retry + 1}/{args.retries}")
@@ -227,7 +228,7 @@ def main():
                 #print("\nRaw Network Data:", network) 
                 print(f"\nSSID: {network.get('SSID', 'N/A')}")
                 #print(f"  Signal Strength: {network.get('Signal', 'N/A')}%")
-                #print(f"  Authentication: {network.get('Authentication', 'N/A')}")
+                print(f"  Authentication: {network.get('Authentication', 'N/A')}")
                 #print(f"  Encryption: {network.get('Encryption', 'N/A')}")
                 #print(f"  Channel: {network.get('Channel', 'N/A')}")
                 #print(f"  Band: {network.get('Band', 'N/A')}")
@@ -237,8 +238,8 @@ def main():
                 #if platform.system().lower() == "linux":
                 #    sc.cf_pins(pins, args.interface)
                 
-        else:
-            print("No networks found.")
+#        else:
+#            print("No networks found.")
         time.sleep(args.timeout)
 
     print("Scanning completed!")
