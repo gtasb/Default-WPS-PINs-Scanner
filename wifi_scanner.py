@@ -280,6 +280,7 @@ def main():
         networks = scan_wifi()
         if networks:
             print("Available Wi-Fi Networks:")
+            found_any = False
             for network in networks:
                 bssid = network.get('BSSID', 'N/A')
                 ssid = network.get('SSID', 'N/A')
@@ -288,9 +289,9 @@ def main():
                 # 查找 PIN
                 pins = sc.find_pin(bssid, pin_db)
 
-                # 默认只显示有 PIN 的网络，除非加了 --all 参数
+                # 默认只显示有 PIN 的网络，除非使用 --all 参数
                 if not args.all and not pins:
-                    continue  # 跳过没有 PIN 的网络
+                    continue
 
                 # 显示网络信息
                 print(f"\nSSID: {ssid}")
@@ -300,6 +301,11 @@ def main():
                     print(f"  Matching PIN(s): {', '.join(pins)}")
                 else:
                     print(f"  No matching PIN found.")
+
+                found_any = True
+
+            if not found_any:
+                print("No matching PIN found for any network.")
         else:
             print("No networks found.")
 
