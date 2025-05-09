@@ -87,13 +87,14 @@ def parse_iw_scan(output):
 
     for line in lines:
         line = line.strip()
-        if line.startswith("BSS ") and "on" in line:  # 开始一个新的 BSSID 条目
+        if line.startswith("BSS ") and "on" in line:
             bssid_part = line[4:].split('(', 1)[0].strip()
             if current_network and "BSSID" in current_network:
                 networks.append(current_network)
             current_network = {"BSSID": bssid_part}
-        elif line.startswith("SSID:"):  # 提取 SSID 并尝试解码
-            ssid = line[5:].strip()[1:]
+        elif line.startswith("SSID:"):
+            # ssid = line[5:].strip()[1:]  ❌ 错误：丢失首字母
+            ssid = line[5:].strip()     # ✅ 修复：去掉 [1:]
             try:
                 ssid = bytes(ssid.encode('latin1')).decode('utf-8')
             except:
