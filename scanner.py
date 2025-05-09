@@ -25,7 +25,7 @@ def find_pin(bssid, pin_db):
     if not matches.empty:
         for index, match in matches.iterrows():
             pins.append(match['PIN'])
-            print(f"→ PIN: {match['PIN']}")
+            print(f"→ MATCH PIN: {match['PIN']}")
     else:
         print("No matching PIN found.")
     return pins

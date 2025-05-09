@@ -260,9 +260,14 @@ def parse_networks(output):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Wi-Fi Network Scanner Tool")
-    parser.add_argument('-t', '--timeout', type=int, default=10, help='Timeout duration between scans in seconds')
-    parser.add_argument('-r', '--retries', type=int, default=1, help='Number of retries for scanning')
-    parser.add_argument('-i', '--interface', type=str, default='wlan0', help='Network interface name')
+    parser.add_argument('-t', '--timeout', type=int, default=10,
+                        help='Timeout duration between scans in seconds')
+    parser.add_argument('-r', '--retries', type=int, default=1,
+                        help='Number of retries for scanning')
+    parser.add_argument('-i', '--interface', type=str, default='wlan0',
+                        help='Network interface name')
+    parser.add_argument('--all', action='store_true',
+                        help='Show all networks (default: only show networks with matching PIN)')
     return parser.parse_args()
 
 def main():
@@ -276,21 +281,28 @@ def main():
         if networks:
             print("Available Wi-Fi Networks:")
             for network in networks:
-                #print("\nRaw Network Data:", network) 
-                print(f"\nSSID: {network.get('SSID', 'N/A')}")
-                #print(f"  Signal Strength: {network.get('Signal', 'N/A')}%")
-                print(f"  Authentication: {network.get('Authentication', 'N/A')}")
-                #print(f"  Encryption: {network.get('Encryption', 'N/A')}")
-                #print(f"  Channel: {network.get('Channel', 'N/A')}")
-                #print(f"  Band: {network.get('Band', 'N/A')}")
-                print(f"  MAC: {network.get('BSSID', 'N/A')}")
-                #print("\n")
-                pins = sc.find_pin(network.get('BSSID', 'N/A'), pin_db)
-                #if platform.system().lower() == "linux":
-                #    sc.cf_pins(pins, args.interface)
-                
-#        else:
-#            print("No networks found.")
+                bssid = network.get('BSSID', 'N/A')
+                ssid = network.get('SSID', 'N/A')
+                auth = network.get('Authentication', 'N/A')
+
+                # 查找 PIN
+                pins = sc.find_pin(bssid, pin_db)
+
+                # 默认只显示有 PIN 的网络，除非加了 --all 参数
+                if not args.all and not pins:
+                    continue  # 跳过没有 PIN 的网络
+
+                # 显示网络信息
+                print(f"\nSSID: {ssid}")
+                print(f"  Authentication: {auth}")
+                print(f"  MAC: {bssid}")
+                if pins:
+                    print(f"  Matching PIN(s): {', '.join(pins)}")
+                else:
+                    print(f"  No matching PIN found.")
+        else:
+            print("No networks found.")
+
         time.sleep(args.timeout)
 
     print("Scanning completed!")
