@@ -80,18 +80,23 @@ def scan_wifi_linux():
         print(f"Error: {e}")
         return []
 
+import re
+
 def parse_iw_scan(output):
     networks = []
     current_network = {}
     lines = output.splitlines()
 
+    bssid_pattern = re.compile(r"^BSS ([0-9a-fA-F:]{17})")
+
     for line in lines:
         line = line.strip()
-        if line.startswith("BSS "):  # 开始一个新的 BSSID 条目
-            bssid_part = line[4:].split('(', 1)[0].strip()
+        bssid_match = bssid_pattern.match(line)
+
+        if bssid_match:  # 只有真正匹配 BSSID 格式的才作为新网络
             if current_network and "BSSID" in current_network:
                 networks.append(current_network)
-            current_network = {"BSSID": bssid_part}
+            current_network = {"BSSID": bssid_match.group(1)}
         elif line.startswith("SSID:"):  # 提取 SSID 并尝试解码
             ssid = line[5:].strip()[1:]
             try:
