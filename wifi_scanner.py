@@ -44,6 +44,7 @@ def scan_wifi_windows():
         return []
 
 
+""" 
 def scan_wifi_linux():
     try:
         result = subprocess.run(
@@ -62,7 +63,48 @@ def scan_wifi_linux():
         return parse_networks_linux(output)
     except Exception as e:
         print(f"Error: {e}")
+        return [] 
+"""
+
+def scan_wifi_linux():
+    try:
+        result = subprocess.run(
+            ["iw", "dev", "wlan0", "scan"],
+            capture_output=True, text=True, check=True
+        )
+        return parse_iw_scan(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"Scan failed: {e}")
         return []
+    except Exception as e:
+        print(f"Error: {e}")
+        return []
+
+def parse_iw_scan(output):
+    networks = []
+    current_network = {}
+    lines = output.splitlines()
+
+    for line in lines:
+        if "BSS" in line and "on" not in line:
+            if current_network:
+                networks.append(current_network)
+            current_network = {"BSSID": line.strip().split()[1]}
+        elif "SSID:" in line:
+            current_network["SSID"] = line.strip().split(":", 1)[1].strip()
+        elif "signal:" in line:
+            current_network["Signal"] = line.strip().split(":", 1)[1].strip().split(" ")[0]
+        elif "Authentication suites" in line:
+            auth = line.strip().split(":")[1].strip()
+            current_network["Authentication"] = auth
+        elif "Pairwise ciphers" in line or "Group cipher" in line:
+            encryption = line.strip().split(":")[1].strip()
+            current_network["Encryption"] = encryption
+
+    if current_network:
+        networks.append(current_network)
+
+    return networks
 
 
 def scan_wifi_mac():
