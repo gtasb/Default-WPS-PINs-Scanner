@@ -70,7 +70,8 @@ def scan_wifi_linux():
     try:
         result = subprocess.run(
             ["iw", "dev", "wlan0", "scan"],
-            capture_output=True, text=True, check=True
+            capture_output=True, text=True, check=True, 
+            timeout=15
         )
         return parse_iw_scan(result.stdout)
     except subprocess.CalledProcessError as e:
