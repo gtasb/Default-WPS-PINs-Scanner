@@ -86,19 +86,24 @@ def parse_iw_scan(output):
     lines = output.splitlines()
 
     for line in lines:
-        if "BSS" in line and "on" not in line:
+        line = line.strip()
+        if line.startswith("BSS "):  # 匹配以 BSS 开头的行
+            # 提取 BSSID（处理带 (on xxx) 的情况）
+            bssid_part = line[4:].split('(', 1)[0].strip()  # 去掉 (on wlan0) 部分
             if current_network:
                 networks.append(current_network)
-            current_network = {"BSSID": line.strip().split()[1]}
+            current_network = {"BSSID": bssid_part}
         elif "SSID:" in line:
-            current_network["SSID"] = line.strip().split(":", 1)[1].strip()
+            ssid = line.split(":", 1)[1].strip()
+            current_network["SSID"] = ssid
         elif "signal:" in line:
-            current_network["Signal"] = line.strip().split(":", 1)[1].strip().split(" ")[0]
+            signal = line.split(":", 1)[1].strip().split(" ")[0]
+            current_network["Signal"] = signal
         elif "Authentication suites" in line:
-            auth = line.strip().split(":")[1].strip()
+            auth = line.split(":", 1)[1].strip()
             current_network["Authentication"] = auth
         elif "Pairwise ciphers" in line or "Group cipher" in line:
-            encryption = line.strip().split(":")[1].strip()
+            encryption = line.split(":", 1)[1].strip()
             current_network["Encryption"] = encryption
 
     if current_network:
