@@ -280,35 +280,21 @@ def main():
         networks = scan_wifi()
         if networks:
             print("Available Wi-Fi Networks:")
-            found_any = False
             for network in networks:
-                bssid = network.get('BSSID', 'N/A')
-                ssid = network.get('SSID', 'N/A')
-                auth = network.get('Authentication', 'N/A')
-
-                # 查找 PIN
-                pins = sc.find_pin(bssid, pin_db)
-
-                # 默认只显示有 PIN 的网络，除非使用 --all 参数
-                if not args.all and not pins:
-                    continue
-
-                # 显示网络信息
-                print(f"\nSSID: {ssid}")
-                print(f"  Authentication: {auth}")
-                print(f"  MAC: {bssid}")
-                if pins:
-                    print(f"  Matching PIN(s): {', '.join(pins)}")
-                else:
-                    print(f"  No matching PIN found.")
-
-                found_any = True
-
-            if not found_any:
-                print("No matching PIN found for any network.")
-        else:
-            print("No networks found.")
-
+                print(f"\nSSID: {network.get('SSID', 'N/A')}")
+                #print(f"  Signal Strength: {network.get('Signal', 'N/A')}%")
+                #print(f"  Authentication: {network.get('Authentication', 'N/A')}")
+                #print(f"  Encryption: {network.get('Encryption', 'N/A')}")
+                #print(f"  Channel: {network.get('Channel', 'N/A')}")
+                #print(f"  Band: {network.get('Band', 'N/A')}")
+                print(f"  MAC: {network.get('BSSID', 'N/A')}")
+                #print("\n")
+                pins = sc.find_pin(network.get('BSSID', 'N/A'), pin_db)
+                #if platform.system().lower() == "linux":
+                #    sc.cf_pins(pins, args.interface)
+                
+#        else:
+#            print("No networks found.")
         time.sleep(args.timeout)
 
     print("Scanning completed!")
