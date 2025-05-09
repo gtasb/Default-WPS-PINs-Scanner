@@ -87,14 +87,17 @@ def parse_iw_scan(output):
 
     for line in lines:
         line = line.strip()
-        if line.startswith("BSS "):  # 匹配以 BSS 开头的行
-            # 提取 BSSID（处理带 (on xxx) 的情况）
-            bssid_part = line[4:].split('(', 1)[0].strip()  # 去掉 (on wlan0) 部分
+        if line.startswith("BSS "):  # 正确匹配 BSSID 行
+            bssid_part = line[4:].split('(', 1)[0].strip()
             if current_network:
                 networks.append(current_network)
             current_network = {"BSSID": bssid_part}
-        elif "SSID:" in line:
-            ssid = line.split(":", 1)[1].strip()
+        elif line.startswith("SSID:"):  # 只匹配以 SSID 开头的行
+            ssid = line[5:].strip()[1:]  # 去掉 "SSID:" 和冒号后的空格
+            try:
+                ssid = bytes(ssid.encode('latin1')).decode('utf-8')  # 尝试 UTF-8 解码
+            except:
+                pass
             current_network["SSID"] = ssid
         elif "signal:" in line:
             signal = line.split(":", 1)[1].strip().split(" ")[0]
@@ -106,7 +109,7 @@ def parse_iw_scan(output):
             encryption = line.split(":", 1)[1].strip()
             current_network["Encryption"] = encryption
 
-    if current_network:
+    if current_network and "BSSID" in current_network:
         networks.append(current_network)
 
     return networks
