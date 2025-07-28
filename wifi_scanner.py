@@ -5,6 +5,7 @@ import argparse
 import subprocess
 import scanner as sc
 import os
+from urllib import parse
 
 def scan_wifi():
     system_platform = platform.system().lower()
@@ -271,6 +272,12 @@ def parse_arguments():
                         help='Show all networks (default: only show networks with matching PIN)')
     return parser.parse_args()
 
+def resevere_bssid(bssid):
+    s = bssid.encode('unicode_escape')
+    ss = s.decode('utf-8').replace('\\x', '%')
+    un = parse.unquote(ss)
+    return un
+
 def main():
     args = parse_arguments()
 
@@ -282,7 +289,8 @@ def main():
         if networks:
             print("Available Wi-Fi Networks:")
             for network in networks:
-                print(f"\nSSID: {network.get('SSID', 'N/A')}")
+                print(f"\nSSID: {resevere_bssid(network.get('SSID', 'N/A'))}")
+                #print(f"\nSSID: {network.get('SSID', 'N/A')}")
                 #print(f"  Signal Strength: {network.get('Signal', 'N/A')}%")
                 #print(f"  Authentication: {network.get('Authentication', 'N/A')}")
                 #print(f"  Encryption: {network.get('Encryption', 'N/A')}")
